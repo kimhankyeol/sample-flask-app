@@ -3,7 +3,7 @@ name: Build & Push Docker image to DockerHub
 on:
   push:
     branches:
-      - master # master 브랜치에 push할때 실행
+      - master # master 브랜치에 push할때 실행함
 
 jobs:
   build-and-push:
