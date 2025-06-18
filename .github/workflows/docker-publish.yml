@@ -27,4 +27,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: kimhk1030/sample-flask-app:latest
+          tags: kimhk1030/test-fast-api:latest
