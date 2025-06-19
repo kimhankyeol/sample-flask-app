@@ -8,7 +8,7 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 4. 80포트 오픈 (nginx 기본)....
+# 4. 80포트 오픈 (nginx 기본)..
 EXPOSE 80
 
 # 5. nginx 실행 (기본 CMD 사용)
