@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from GitOps Sample App using FastAPI!"}
+    return {"message": "TEST FAST API!"}
