@@ -65,7 +65,7 @@ jobs:
 
       - name: Update frontend image tag in GitOps repo
         run: |
-          cd $GITOPS_PATH/overlays/dev/frontend
+          cd overlays/dev/frontend
           sed -i "s|image: .*|image: $FRONTEND_IMAGE:latest|" patch-deployment-frontend.yaml
           git config user.name "github-actions"
           git config user.email "actions@github.com"
