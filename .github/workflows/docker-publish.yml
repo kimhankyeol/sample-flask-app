@@ -1,4 +1,4 @@
-ame: Build, Push Docker Image and Update GitOps Repo
+name: Build, Push Docker Image and Update GitOps Repo
 
 on:
   push:
