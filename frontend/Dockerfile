@@ -6,6 +6,7 @@ RUN rm -rf /usr/share/nginx/html/*
 
 # 3. React 빌드 결과 복사
 COPY build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 4. 80포트 오픈 (nginx 기본)....
 EXPOSE 80
