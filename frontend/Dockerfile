@@ -5,7 +5,7 @@ FROM nginx:stable-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # 3. React 빌드 결과 복사
-COPY frontend/build /usr/share/nginx/html
+COPY build /usr/share/nginx/html
 
 # 4. 80포트 오픈 (nginx 기본)
 EXPOSE 80
