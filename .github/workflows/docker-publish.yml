@@ -55,7 +55,7 @@ jobs:
 
       - name: Update backend image tag in GitOps repo
         run: |
-          cd $GITOPS_PATH/overlays/dev
+          cd $GITOPS_PATH/overlays/dev/backend
           sed -i "s|image: .*|image: $BACKEND_IMAGE:latest|" patch-deployment-backend.yaml
           git config user.name "github-actions"
           git config user.email "actions@github.com"
@@ -65,7 +65,7 @@ jobs:
 
       - name: Update frontend image tag in GitOps repo
         run: |
-          cd $GITOPS_PATH/overlays/dev
+          cd $GITOPS_PATH/overlays/dev/frontend
           sed -i "s|image: .*|image: $FRONTEND_IMAGE:latest|" patch-deployment-frontend.yaml
           git config user.name "github-actions"
           git config user.email "actions@github.com"
