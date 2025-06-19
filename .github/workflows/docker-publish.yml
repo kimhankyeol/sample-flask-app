@@ -2,13 +2,15 @@ name: Build, Push Docker Image and Update GitOps Repo
 
 on:
   push:
-    branches:
-      - master
+    branches: ["master"]
     paths:
       - Dockerfile
       - app.py
       - requirements.txt
       - .github/workflows/docker-publish.yml
+
+env:
+  IMAGE_NAME: kimhk1030/test-fast-api
 
 jobs:
   build-and-deploy:
@@ -17,6 +19,9 @@ jobs:
     steps:
       - name: Checkout App Repo
         uses: actions/checkout@v3
+
+      - name: Set image tag with timestamp
+        run: echo "IMAGE_TAG=$(date +%Y%m%d-%H%M)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -27,24 +32,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image (multi-platform)
+      - name: Build and Push Docker image
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t kimhk1030/test-fast-api:latest --push .
+            -t $IMAGE_NAME:${{ env.IMAGE_TAG }} \
+            -t $IMAGE_NAME:latest \
+            --push .
 
-      - name: Checkout GitOps repo
+      - name: Checkout GitOps Repo
         uses: actions/checkout@v3
         with:
           repository: kimhankyeol/myapp-gitops
-          path: gitops
           token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
 
-      - name: Update image tag in GitOps repo
+      - name: Update image tag in GitOps patch-deployment.yaml
         run: |
           cd gitops/overlays/dev
-          sed -i "s|image: .*|image: kimhk1030/test-fast-api:latest|" patch-deployment.yaml
+          sed -i "s|image: .*|image: $IMAGE_NAME:${{ env.IMAGE_TAG }}|" patch-deployment.yaml
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add patch-deployment.yaml
-          git commit -m "Update image tag to latest"
+          git commit -m "Update image tag to $IMAGE_TAG"
           git push
