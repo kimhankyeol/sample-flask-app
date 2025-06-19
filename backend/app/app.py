@@ -11,6 +11,13 @@ app = FastAPI(title="Slope DEM API")
 origins = [
     "http://localhost:3000",     # React 개발용 (포트 3000)
     "http://127.0.0.1:3000",
+     "http://192.168.219.103:31301",
+    "http://192.168.219.102:31301",
+    "http://192.168.219.109:31301",
+     "https://192.168.219.103:31301",
+    "https://192.168.219.102:31301",
+    "https://192.168.219.109:31301",
+    
     # 배포 시 도메인 추가
     # "https://your-production-domain.com"
 ]
