@@ -1,16 +1,17 @@
-name: Build, Push Docker Image and Update GitOps Repo
+name: Build, Push Docker Images and Update GitOps Repo
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - main
     paths:
-      - Dockerfile
-      - app.py
-      - requirements.txt
+      - backend/**
+      - frontend/**
       - .github/workflows/docker-publish.yml
 
 env:
-  IMAGE_NAME: kimhk1030/test-fast-api
+  BACKEND_IMAGE: kimhk1030/backend-app
+  FRONTEND_IMAGE: kimhk1030/front-app
 
 jobs:
   build-and-deploy:
@@ -19,9 +20,6 @@ jobs:
     steps:
       - name: Checkout App Repo
         uses: actions/checkout@v3
-
-      - name: Set image tag with timestamp
-        run: echo "IMAGE_TAG=$(date +%Y%m%d-%H%M)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -32,26 +30,43 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker image
+      - name: Build and push backend image (multi-platform)
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t $IMAGE_NAME:${{ env.IMAGE_TAG }} \
-            -t $IMAGE_NAME:latest \
-            --push .
+            -t $BACKEND_IMAGE:latest \
+            -f backend/Dockerfile \
+            --push backend/
 
-      - name: Checkout GitOps Repo
+      - name: Build and push frontend image (multi-platform)
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t $FRONTEND_IMAGE:latest \
+            -f frontend/Dockerfile \
+            --push frontend/
+
+      - name: Checkout GitOps repo
         uses: actions/checkout@v3
         with:
           repository: kimhankyeol/myapp-gitops
-          token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
 
-      - name: Update image tag in GitOps patch-deployment.yaml
+      - name: Update backend image tag in GitOps repo
         run: |
           cd gitops/overlays/dev
-          sed -i "s|image: .*|image: $IMAGE_NAME:${{ env.IMAGE_TAG }}|" patch-deployment.yaml
+          sed -i "s|image: .*|image: $BACKEND_IMAGE:latest|" patch-deployment-backend.yaml
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add patch-deployment.yaml
-          git commit -m "Update image tag to $IMAGE_TAG"
+          git add patch-deployment-backend.yaml
+          git commit -m "Update backend image tag to latest"
+          git push
+
+      - name: Update frontend image tag in GitOps repo
+        run: |
+          cd gitops/overlays/dev
+          sed -i "s|image: .*|image: $FRONTEND_IMAGE:latest|" patch-deployment-frontend.yaml
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add patch-deployment-frontend.yaml
+          git commit -m "Update frontend image tag to latest"
           git push
