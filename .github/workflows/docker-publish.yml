@@ -3,12 +3,12 @@ ame: Build, Push Docker Image and Update GitOps Repo
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - Dockerfile
       - app.py
       - requirements.txt
-      - .github/workflows/**
+      - .github/workflows/docker-publish.yml
 
 jobs:
   build-and-deploy:
